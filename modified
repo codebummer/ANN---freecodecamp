@@ -89,7 +89,7 @@ model.add(Dense(1))
 model.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
 #Train the model
-model.fit(x_train, y_train, batch_size = 32, epochs = 100)
+model.fit(x_train, y_train, batch_size = 1, epochs = 1)
 
 #Create the testing data set
 #Create a new array containing scaled values from index 1543 to 2003
