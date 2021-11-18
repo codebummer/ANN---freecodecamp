@@ -53,7 +53,7 @@ print(f'\n\nThe contents of x_train and y_train are \n')
 for i in range(60, len(train_data)):
     x_train.append(train_data[i-60 : i, 0])
     y_train.append(train_data[i, 0])
-    if i <= 61:
+    if i <= 65:
         print(f'x_train:\n{x_train}\n')
         print(f'y_train:\n{y_train}\n')
         
@@ -92,6 +92,7 @@ x_test = []
 y_test = dataset[training_data_len : , :]
 for i in range(60, len(test_data)):
     x_test.append(test_data[i-60:i, 0])
+    # y_test = np.append(y_test, test_data[i, 0]) - added by me
 
 #Convert the data to a numpy array
 x_test = np.array(x_test)
