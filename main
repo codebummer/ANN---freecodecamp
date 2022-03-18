@@ -117,8 +117,8 @@ plt.legend(['Train', 'Val', 'Predictions'], loc = 'lower right')
 plt.show()
 
 #Calculate a predicted price for the next day
-# print(f"Price Predicted on {data.index[-1]}: ", scaled_data[-1] * predictions[-1] / predictions_scaled[-1])
-print(f"Price Predicted on {data.index[-1]}: ", dataset[-1] / x_test[-1,-1,0] * predictions_scaled[-1])
+print(f"Price Predicted on {data.index[-1]}: ", scaled_data[-1] * predictions[-1] / predictions_scaled[-1])
+#print(f"Price Predicted on {data.index[-1]}: ", dataset[-1] / x_test[-1,-1,0] * predictions_scaled[-1])
 
 
 
