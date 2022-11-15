@@ -99,17 +99,21 @@ valid = data[training_data_len:]
 valid['Predictions'] = predictions
 
 #Calculate yesterday, today, and tomorrow prices
-x_next = [df.Close.values[-62:-2], df.Close.values[-61:-1],df.Close.values[-60:]]
+x_next = [df.Close.values[-62:-2], df.Close.values[-61:-1], df.Close.values[-60:]]
+scaler_mini = MinMaxScaler(feature_range = (0, 1))
+scaled_x_next = scaler_mini.fit_transform(x_next)
 x_next = np.array(x_next)
-scaled_x_next = scaler.fit_transform(x_next)
-# x_next = np.array(x_next)
 x_next = np.reshape(x_next, (x_next.shape[0], x_next.shape[1], 1))
 pred_next = model.predict(x_next)
-pred_next = scaler.inverse_transform(pred_next)
-print('Predicted Prices of Yestday, Today, Tomorrow: ', pred_next)
+pred_tomorrow = np.empty(x_next.shape)
+pred_tomorrow = scaler_mini.inverse_transform(pred_next)
+print('Predicted Prices of Yestday, Today, Tomorrow: ', pred_tomorrow)
 
-
-
+# x = df[['Open','High','Low','Volume','Close']].values
+# y = df[['Close']].values
+# x[:2]
+# y[1]
+# y[2]
 
 #Visualize the data
 plt.figure(figsize = (16, 8))
