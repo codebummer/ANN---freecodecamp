@@ -45,12 +45,8 @@ x_train = []
 y_train = []
 
 for i in range(60, len(train_data)):
-    x_train.append(train_data[i-60 : i, 0])
-    y_train.append(train_data[i, 0])
-    # if i <= 61:
-    #     print(x_train)
-    #     print(y_train)
-    #     print()
+    x_train.append(train_data[i-60 : i, 0]) # the last day data of indexed i is not included    
+    y_train.append(train_data[i, 0]) # the last day data of index i is included
 
 #Convert the x_train and y_train to numpy arrays
 x_train, y_train = np.array(x_train), np.array(y_train)
@@ -80,9 +76,9 @@ model.fit(x_train, y_train, batch_size = 1, epochs = 8)
 test_data = scaled_data[training_data_len - 60 : , :]
 #Create the data sets x_test and y_test
 x_test = []
-y_test = dataset[training_data_len : , :]
+y_test = dataset[training_data_len : , :] # the last day data of indexed i is included  
 for i in range(60, len(test_data)):
-    x_test.append(test_data[i-60:i, 0])
+    x_test.append(test_data[i-60:i, 0]) # the last day data of indexed i is not included  
 
 #Convert the data to a numpy array
 x_test = np.array(x_test)
@@ -97,10 +93,23 @@ predictions = scaler.inverse_transform(predictions) #Inverse transform data
 #Get the root mean squared error(RMSE)
 rmse = np.sqrt(np.mean(predictions - y_test) ** 2)
 
-#Plot th data
+#Plot the data
 train = data[:training_data_len]
 valid = data[training_data_len:]
 valid['Predictions'] = predictions
+
+#Calculate yesterday, today, and tomorrow prices
+x_next = [df.Close.values[-62:-2], df.Close.values[-61:-1],df.Close.values[-60:]]
+x_next = np.array(x_next)
+scaled_x_next = scaler.fit_transform(x_next)
+# x_next = np.array(x_next)
+x_next = np.reshape(x_next, (x_next.shape[0], x_next.shape[1], 1))
+pred_next = model.predict(x_next)
+pred_next = scaler.inverse_transform(pred_next)
+print('Predicted Prices of Yestday, Today, Tomorrow: ', pred_next)
+
+
+
 
 #Visualize the data
 plt.figure(figsize = (16, 8))
