@@ -14,7 +14,7 @@ from datetime import datetime
 plt.style.use('fivethirtyeight')
 
 start = datetime(2021, 1, 1)
-end = datetime(2022, 11, 15)
+end = datetime(2022, 11, 21)
 #Get the stock quote
 stock = '900310'
 # stock = '005930.ks'
@@ -98,22 +98,35 @@ train = data[:training_data_len]
 valid = data[training_data_len:]
 valid['Predictions'] = predictions
 
-#Calculate yesterday, today, and tomorrow prices
-x_next = [df.Close.values[-62:-2], df.Close.values[-61:-1], df.Close.values[-60:]]
-scaler_mini = MinMaxScaler(feature_range = (0, 1))
-scaled_x_next = scaler_mini.fit_transform(x_next)
-x_next = np.array(x_next)
-x_next = np.reshape(x_next, (x_next.shape[0], x_next.shape[1], 1))
-pred_next = model.predict(x_next)
-pred_tomorrow = np.empty(x_next.shape)
-pred_tomorrow = scaler_mini.inverse_transform(pred_next)
-print('Predicted Prices of Yestday, Today, Tomorrow: ', pred_tomorrow)
+#Calculate tomorrow prices including the past four days
+x_recent = test_data[-65:, :]
+x_calc = []
+for i in range(len(x_recent)-60):
+    x_calc.append(x_recent[i:i+60, 0])
+x_calc.append(x_recent[-60:, 0])
+x_calc = np.array(x_calc)
+x_calc = np.reshape(x_calc, (x_calc.shape[0], x_calc.shape[1], 1))
+pred_next = model.predict(x_calc)
+pred_next = scaler.inverse_transform(pred_next)
+print(pred_next)
 
-# x = df[['Open','High','Low','Volume','Close']].values
-# y = df[['Close']].values
-# x[:2]
-# y[1]
-# y[2]
+# #Calculate the same values as above but using the prior lines of statements (x_test)
+# x_test = []
+# # the last day data of indexed i is included  
+# for i in range(60, len(test_data)):
+#     x_test.append(test_data[i-60:i, 0]) # the last day data of indexed i is not included  
+# # The following single line statement includes the last day data of test_data, 
+# # which will provide independence variables 
+# # to predict the last dependent variable for tomorrow
+# x_test.append(test_data[-60: , 0]) 
+# #Convert the data to a numpy array
+# x_test = np.array(x_test)
+# #Reshape the data
+# x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
+# #Get the models predicted price values
+# predictions = model.predict(x_test)
+# predictions = scaler.inverse_transform(predictions) #Inverse transform data
+
 
 #Visualize the data
 plt.figure(figsize = (16, 8))
