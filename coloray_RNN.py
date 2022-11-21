@@ -10,7 +10,7 @@ from sklearn.preprocessing import MinMaxScaler #install scikit-learn to import s
 from keras.models import Sequential
 from keras.layers import Dense, LSTM
 import matplotlib.pyplot as plt
-from datetime import datetime
+from datetime import datetime, timedelta
 plt.style.use('fivethirtyeight')
 
 start = datetime(2021, 1, 1)
@@ -98,7 +98,7 @@ train = data[:training_data_len]
 valid = data[training_data_len:]
 valid['Predictions'] = predictions
 
-#Calculate tomorrow prices including the past four days
+#Calculate tomorrow prices including the past five days
 x_recent = test_data[-65:, :]
 x_calc = []
 for i in range(len(x_recent)-60):
@@ -108,8 +108,15 @@ x_calc = np.array(x_calc)
 x_calc = np.reshape(x_calc, (x_calc.shape[0], x_calc.shape[1], 1))
 pred_next = model.predict(x_calc)
 pred_next = scaler.inverse_transform(pred_next)
+pred_next = np.reshape(pred_next, (6))
+# day_to_begin = datetime.today() - timedelta(days=4)
+# pred_index = [pd.date_range(day_to_begin, periods=6).strftime('%Y-%m-%d')]
+pred_index = list(valid.index[-5:])
+adding = datetime.today()+timedelta(days=1)
+pred_index.append(datetime.timestamp(adding))
+pred = pd.DataFrame({'Predictions' : pred_next}, index=valid.index[-5:])
+print(pred)
 print(pred_next)
-
 # #Calculate the same values as above but using the prior lines of statements (x_test)
 # x_test = []
 # # the last day data of indexed i is included  
