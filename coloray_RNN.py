@@ -32,7 +32,7 @@ df.drop(columns=['체결시간'], inplace=True)
 df.index = df.index.strftime('%H:%M:%S')
 df.index = pd.to_datetime(df.index)
 df = df[['현재가']][-500:]
-df['현재가'] = df['현재가'].str.strip('-')
+df['현재가'] = df['현재가'].str.strip('-') # Series strip()
 df['현재가'] = df['현재가'].astype(int)
 
 
@@ -83,7 +83,7 @@ model.add(Dense(1))
 model.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
 #Train the model
-model.fit(x_train, y_train, batch_size = 1, epochs = 20)
+model.fit(x_train, y_train, batch_size = 1, epochs = 6)
 
 #Create the testing data set
 #Create a new array containing scaled values from index 1543 to 2003
