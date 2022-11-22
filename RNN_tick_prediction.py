@@ -17,7 +17,8 @@ plt.style.use('fivethirtyeight')
 path = r'D:\myprojects\TradingDB\2022-11-22\005930_주식체결.db'
 with sqlite3.connect(path) as file:
     df = pd.read_sql('SELECT * FROM [주식체결]', file)
-    
+
+df = df[['체결시간','현재가']][-1000:]
 df.index = df['체결시간'].values
 #Get the number of rows and columns in the data set
 df.shape
