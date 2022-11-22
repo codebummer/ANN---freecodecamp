@@ -112,11 +112,11 @@ pred_next = np.reshape(pred_next, (6))
 # day_to_begin = datetime.today() - timedelta(days=4)
 # pred_index = [pd.date_range(day_to_begin, periods=6).strftime('%Y-%m-%d')]
 pred_index = list(valid.index[-5:])
-adding = datetime.today()+timedelta(days=1)
-pred_index.append(datetime.timestamp(adding))
-pred = pd.DataFrame({'Predictions' : pred_next}, index=valid.index[-5:])
-print(pred)
-print(pred_next)
+adding = valid.index[-1]+timedelta(days=1)
+pred_index.append(adding)
+pred = pd.DataFrame({'Predictions' : pred_next}, index=pred_index)
+print(valid[-5:], pred)
+
 # #Calculate the same values as above but using the prior lines of statements (x_test)
 # x_test = []
 # # the last day data of indexed i is included  
