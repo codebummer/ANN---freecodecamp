@@ -21,16 +21,19 @@ plt.style.use('fivethirtyeight')
 # stock = '005930'
 # df = web.DataReader(stock, data_source = 'naver', start = start, end = end)
 # df = df.astype('float64')
-
 path = r'D:\myprojects\TradingDB\2022-11-22\005930_주식체결.db'
 with sqlite3.connect(path) as file:
     df = pd.read_sql('SELECT * FROM [주식체결]', file)
 
 df.체결시간 = pd.to_datetime(df.체결시간, format= '%H%M%S')
 df.index = df['체결시간'].values
-df.index = df.index.strftime('%H:%M:%S')
 df.drop(columns=['체결시간'], inplace=True) 
+df.index = df.index.strftime('%H:%M:%S')
+df.index = pd.to_datetime(df.index)
 df = df[['현재가']][-500:]
+for i in range(len(df)):
+    df['현재가'][i] = df['현재가'][i].strip('-')
+df.astype(int)
 
 #Get the number of rows and columns in the data set
 df.shape
@@ -122,7 +125,7 @@ pred_next = np.reshape(pred_next, (6))
 # day_to_begin = datetime.today() - timedelta(days=4)
 # pred_index = [pd.date_range(day_to_begin, periods=6).strftime('%Y-%m-%d')]
 pred_index = list(valid.index[-5:])
-adding = valid.index[-1]+timedelta(days=1)
+adding = valid.index[-1]+timedelta(seconds=1)
 pred_index.append(adding)
 pred = pd.DataFrame({'Predictions' : pred_next}, index=pred_index)
 print(valid[-5:],'\n\n', pred)
