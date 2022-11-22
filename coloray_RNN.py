@@ -11,22 +11,36 @@ from keras.models import Sequential
 from keras.layers import Dense, LSTM
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
+import sqlite3
 plt.style.use('fivethirtyeight')
 
-start = datetime(2021, 1, 1)
-end = datetime(2022, 11, 21)
-#Get the stock quote
-stock = '900310'
-# stock = '005930.ks'
-df = web.DataReader(stock, data_source = 'naver', start = start, end = end)
-df = df.astype('float64')
-df.isnull().values.any()
+# start = datetime(2018, 1, 1)
+# end = datetime(2022, 11, 21)
+# #Get the stock quote
+
+# stock = '005930'
+# df = web.DataReader(stock, data_source = 'naver', start = start, end = end)
+# df = df.astype('float64')
+path = r'D:\myprojects\TradingDB\2022-11-22\005930_주식체결.db'
+with sqlite3.connect(path) as file:
+    df = pd.read_sql('SELECT * FROM [주식체결]', file)
+
+df.체결시간 = pd.to_datetime(df.체결시간, format= '%H%M%S')
+df.index = df['체결시간'].values
+df.drop(columns=['체결시간'], inplace=True) 
+df.index = df.index.strftime('%H:%M:%S')
+df.index = pd.to_datetime(df.index)
+df = df[['현재가']][-500:]
+for i in range(len(df)):
+    df['현재가'][i] = df['현재가'][i].strip('-')
+df['현재가'] = df['현재가'].astype(int)
+
 
 #Get the number of rows and columns in the data set
 df.shape
 
 #Create a new dataframe with only the 'Close' column
-data = df.filter(['Close'])
+data = df.filter(['현재가'])
 #Convert the dataframe to a numpy array
 dataset = data.values
 #Get the number of rows to train the model on
@@ -69,7 +83,7 @@ model.add(Dense(1))
 model.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
 #Train the model
-model.fit(x_train, y_train, batch_size = 1, epochs = 8)
+model.fit(x_train, y_train, batch_size = 1, epochs = 20)
 
 #Create the testing data set
 #Create a new array containing scaled values from index 1543 to 2003
@@ -97,7 +111,7 @@ rmse = np.sqrt(np.mean(predictions - y_test) ** 2)
 train = data[:training_data_len]
 valid = data[training_data_len:]
 valid['Predictions'] = predictions
-
+valid.Predictions = valid.Predictions.astype(int)
 #Calculate tomorrow prices including the past five days
 x_recent = test_data[-65:, :]
 x_calc = []
@@ -112,40 +126,18 @@ pred_next = np.reshape(pred_next, (6))
 # day_to_begin = datetime.today() - timedelta(days=4)
 # pred_index = [pd.date_range(day_to_begin, periods=6).strftime('%Y-%m-%d')]
 pred_index = list(valid.index[-5:])
-adding = valid.index[-1]+timedelta(days=1)
+adding = valid.index[-1]+timedelta(seconds=1)
 pred_index.append(adding)
 pred = pd.DataFrame({'Predictions' : pred_next}, index=pred_index)
-print(valid[-5:], pred)
-
-# #Calculate the same values as above but using the prior lines of statements (x_test)
-# x_test = []
-# # the last day data of indexed i is included  
-# for i in range(60, len(test_data)):
-#     x_test.append(test_data[i-60:i, 0]) # the last day data of indexed i is not included  
-# # The following single line statement includes the last day data of test_data, 
-# # which will provide independence variables 
-# # to predict the last dependent variable for tomorrow
-# x_test.append(test_data[-60: , 0]) 
-# #Convert the data to a numpy array
-# x_test = np.array(x_test)
-# #Reshape the data
-# x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
-# #Get the models predicted price values
-# predictions = model.predict(x_test)
-# predictions = scaler.inverse_transform(predictions) #Inverse transform data
-
+print(valid[-5:],'\n\n', pred)
 
 #Visualize the data
 plt.figure(figsize = (16, 8))
 plt.title('Model')
 plt.xlabel('Data', fontsize = 18)
 plt.ylabel('Close Price USD ($)', fontsize = 18)
-plt.plot(train['Close'])
-plt.plot(valid[['Close', 'Predictions']])
+plt.plot(train['현재가'])
+plt.plot(valid[['현재가', 'Predictions']])
 plt.legend(['Train', 'Val', 'Predictions'], loc = 'upper right')
 plt.show()
 
-#Calculate a predicted price for the next day
-print(f"Price Predicted on {data.index[-1]}: ", predictions[-1])
-# print(f"Price Predicted on {data.index[-1]}: ", scaled_data[-1] * predictions[-1] / predictions_scaled[-1])
-#print(f"Price Predicted on {data.index[-1]}: ", dataset[-1] / x_test[-1,-1,0] * predictions_scaled[-1])
