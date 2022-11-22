@@ -21,6 +21,7 @@ plt.style.use('fivethirtyeight')
 # stock = '005930'
 # df = web.DataReader(stock, data_source = 'naver', start = start, end = end)
 # df = df.astype('float64')
+
 path = r'D:\myprojects\TradingDB\2022-11-22\005930_주식체결.db'
 with sqlite3.connect(path) as file:
     df = pd.read_sql('SELECT * FROM [주식체결]', file)
@@ -31,8 +32,7 @@ df.drop(columns=['체결시간'], inplace=True)
 df.index = df.index.strftime('%H:%M:%S')
 df.index = pd.to_datetime(df.index)
 df = df[['현재가']][-500:]
-for i in range(len(df)):
-    df['현재가'][i] = df['현재가'][i].strip('-')
+df['현재가'] = df['현재가'].str.strip('-')
 df['현재가'] = df['현재가'].astype(int)
 
 
@@ -135,7 +135,7 @@ print(valid[-5:],'\n\n', pred)
 plt.figure(figsize = (16, 8))
 plt.title('Model')
 plt.xlabel('Data', fontsize = 18)
-plt.ylabel('Close Price USD ($)', fontsize = 18)
+plt.ylabel('Close Price KRW (W)', fontsize = 18)
 plt.plot(train['현재가'])
 plt.plot(valid[['현재가', 'Predictions']])
 plt.legend(['Train', 'Val', 'Predictions'], loc = 'upper right')
