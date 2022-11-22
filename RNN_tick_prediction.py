@@ -21,15 +21,17 @@ plt.style.use('fivethirtyeight')
 # stock = '005930'
 # df = web.DataReader(stock, data_source = 'naver', start = start, end = end)
 # df = df.astype('float64')
+
 path = r'D:\myprojects\TradingDB\2022-11-22\005930_주식체결.db'
 with sqlite3.connect(path) as file:
     df = pd.read_sql('SELECT * FROM [주식체결]', file)
 
 df.체결시간 = pd.to_datetime(df.체결시간, format= '%H%M%S')
-df.drop(columns=['체결시간'], inplace=True) 
-df.index = df.index.strftime('%H:%M:%S')
-df = df[['체결시간','현재가']][-500:]
 df.index = df['체결시간'].values
+df.index = df.index.strftime('%H:%M:%S')
+df.drop(columns=['체결시간'], inplace=True) 
+df = df[['현재가']][-500:]
+
 #Get the number of rows and columns in the data set
 df.shape
 
