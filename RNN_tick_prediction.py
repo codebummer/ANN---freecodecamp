@@ -14,11 +14,21 @@ from datetime import datetime, timedelta
 import sqlite3
 plt.style.use('fivethirtyeight')
 
+# start = datetime(2018, 1, 1)
+# end = datetime(2022, 11, 21)
+# #Get the stock quote
+
+# stock = '005930'
+# df = web.DataReader(stock, data_source = 'naver', start = start, end = end)
+# df = df.astype('float64')
 path = r'D:\myprojects\TradingDB\2022-11-22\005930_주식체결.db'
 with sqlite3.connect(path) as file:
     df = pd.read_sql('SELECT * FROM [주식체결]', file)
 
-df = df[['체결시간','현재가']][-1000:]
+df.체결시간 = pd.to_datetime(df.체결시간, format= '%H%M%S')
+df.drop(columns=['체결시간'], inplace=True) 
+df.index = df.index.strftime('%H:%M:%S')
+df = df[['체결시간','현재가']][-500:]
 df.index = df['체결시간'].values
 #Get the number of rows and columns in the data set
 df.shape
@@ -67,7 +77,7 @@ model.add(Dense(1))
 model.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
 #Train the model
-model.fit(x_train, y_train, batch_size = 1, epochs = 1)
+model.fit(x_train, y_train, batch_size = 1, epochs = 8)
 
 #Create the testing data set
 #Create a new array containing scaled values from index 1543 to 2003
