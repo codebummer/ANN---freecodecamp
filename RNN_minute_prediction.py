@@ -24,7 +24,7 @@ plt.style.use('fivethirtyeight')
 path = r'D:\myprojects\TradingDB\삼성전자_주식분봉차트60분_2022_11_24.db'
 with sqlite3.connect(path) as file:
     df = pd.read_sql('SELECT * FROM [주식분봉차트]', file)
-
+df = df.sort_values(by='index', ascending=False)
 df.체결시간 = pd.to_datetime(df.체결시간, format= '%Y%m%d%H%M%S')
 df.index = df['체결시간'].values
 df.drop(columns=['체결시간'], inplace=True) 
