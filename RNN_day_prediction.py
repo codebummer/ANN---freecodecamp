@@ -26,12 +26,14 @@ path = r'D:\myprojects\TradingDB\삼성전자_주식일봉차트_2022_11_24.db'
 with sqlite3.connect(path) as file:
     df = pd.read_sql('SELECT * FROM [주식일봉차트]', file)
 
+df = df.sort_values(by='index', ascending=False)
 df.일자 = pd.to_datetime(df.일자, format= '%Y%m%d')
 df.index = df['일자'].values
 df.drop(columns=['일자'], inplace=True) 
 df = df[['현재가']]
 for i in range(len(df)):
-    df['현재가'][i] = int(df['현재가'][i].strip('+-'))
+    df['현재가'][i] = df['현재가'][i].strip('+-')
+df = df.astype('int')
 
 #Get the number of rows and columns in the data set
 df.shape
