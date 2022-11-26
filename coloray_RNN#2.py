@@ -10,6 +10,8 @@ from sklearn.preprocessing import MinMaxScaler #install scikit-learn to import s
 from keras.models import Sequential
 from keras.layers import Dense, LSTM
 import matplotlib.pyplot as plt
+import matplotlib.font_manager as fontman
+import matplotlib as mat
 from datetime import datetime, timedelta
 import os, json
 plt.style.use('fivethirtyeight')
@@ -22,8 +24,9 @@ start = datetime(2018, 1, 1)
 end = datetime(2022, 11, 21)
 #Get the stock quote
 
-stockcode = '005930'
-stock = ticker_stock['tickerkeys'][stockcode]
+stock = '삼성전자'
+#stockcode = '005930'
+stockcode = ticker_stock['stockkeys'][stock]
 df = web.DataReader(stockcode, data_source = 'naver', start = start, end = end)
 df = df.astype('float64')
 
@@ -123,6 +126,8 @@ pred = pd.DataFrame({'Predictions' : pred_next}, index=pred_index)
 print(valid[-5:],'\n\n', pred)
 
 #Visualize the data
+fonts = [font.name for font in fontman.fontManager.ttflist]
+mat.rcParams['font.family'] = 'UnDotum'
 plt.figure(figsize = (16, 8))
 plt.title('Model')
 plt.suptitle(f'{stock}')
@@ -130,6 +135,6 @@ plt.xlabel('Data', fontsize = 18)
 plt.ylabel('Close Price KRW (W)', fontsize = 18)
 plt.plot(train['Close'])
 plt.plot(valid[['Close', 'Predictions']])
-plt.legend(['Train', 'Val', 'Predictions'], loc = 'upper right')
+plt.legend(['Train', 'Val', 'Predictions'], loc = 'best')
 plt.show()
 
